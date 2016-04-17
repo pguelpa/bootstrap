@@ -1,0 +1,2 @@
+# bootstrap
+Bootstrap my machine
