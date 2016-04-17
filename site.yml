@@ -1,0 +1,86 @@
+---
+- name: Setup development environment
+  hosts: all
+  vars:
+    home: /Users/pguelpa
+    src: /Users/pguelpa/Documents/Workspace
+    github_user: pguelpa
+    dotfiles: dotfiles
+
+  tasks:
+    - name: Install homebrew
+      git: repo=git@github.com:Homebrew/brew.git dest=/usr/local force=no update=no
+
+    - name: Tap additional homebrew repos
+      homebrew_tap: tap={{ item }} state=present
+      with_items:
+        - caskroom/cask
+        - homebrew/versions
+
+    - name: Install libraries with homebrew
+      homebrew: name={{ item }} state=present
+      with_items:
+        - go
+        - heroku-toolbelt
+        - jq
+        - keybase
+        - mysql
+        - nodejs
+        - postgresql
+        - qt55
+        - rbenv
+        - tmux
+        - zsh
+        - zsh-completions
+
+    - name: Install Homebrew Casks
+      homebrew_cask: name={{ item }} state=present
+      with_items:
+        - 1password
+        - atom
+        - evernote
+        - gitbook-editor
+        - google-chrome
+        - google-drive
+        - iterm2
+        - java
+        - mou
+        - omnigraffle
+        - postman
+        - sequel-pro
+        - spotify
+        - tidal
+
+    - name: Clone dotfiles
+      # I set force and update to no so that if I have any working changes or changes that I haven't pushed up it doesn't reset my local history.
+      git: repo=git@github.com:{{ github_user }}/{{ dotfiles }}.git dest={{ src }}/{{ dotfiles }} force=no update=no
+
+    - name: Symlink dotfiles
+      file: path={{ home }}/{{ item }} src={{ src }}/{{ dotfiles }}/home/{{ item }} state=link
+      with_items:
+        - .gitconfig
+        - .gitignore
+        - .zshrc
+
+    - name: Symlink Library/Preferences
+      file: path={{ home }}/Library/Preferences/{{ item }} src={{ src }}/{{ dotfiles }}/Library/Preferences/{{ item }} state=link
+      with_items:
+        - com.mizage.Divvy.plist
+        - com.apple.dock.plist
+
+    - name: Install Ruby
+      shell: rbenv install {{ item }} creates={{ home }}/.rbenv/versions/{{ item }}
+      with_items:
+        - 2.3.0
+
+    - name: Install Atom packages
+      shell: apm install {{ item.package }}@{{ item.version }} creates={{ home }}/.atom/packages/{{ item.package }}
+      with_items:
+        - { package: 'Sublime-Style-Column-Selection', version: '1.5.1' }
+        - { package: 'language-ansible', version: '0.1.3' }
+        - { package: 'language-rspec', version: '0.5.0' }
+        - { package: 'linter', version: '1.11.4' }
+        - { package: 'linter-ansible-linting', version: '1.1.1' }
+        - { package: 'linter-ruby', version: '1.2.2' }
+        - { package: 'rails-rspec', version: '0.3.2' }
+        - { package: 'ruby-test', version: '0.9.17' }
