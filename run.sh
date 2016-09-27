@@ -15,7 +15,7 @@ which ansible > /dev/null
 if [ $? -ne 0 ]; then
   echo "No"
   echo "Installing ansible"
-  sudo easy_install pip
+  sudo easy_install ansible
 else
   echo "OK"
 fi
