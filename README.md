@@ -1,2 +1,2 @@
 # bootstrap
-Bootstrap my machine
+Bootstrap my machine.
